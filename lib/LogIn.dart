@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'package:student_app/api.dart';
 import 'dart:convert';
 
+import 'login_model.dart';
+
 class LogIn extends StatefulWidget {
   const LogIn({super.key});
 
@@ -18,25 +20,31 @@ class _LogInState extends State<LogIn> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+
+  late LoginModel loginModel;
+
   loginApi() async {
     final response = await http.post(
       Uri.parse('http://${Api_name().api}/Student_app/login.php'),
       body: jsonEncode(<String, dynamic>{
-        "Email": emailController.text,
-        "password": passwordController.text,
+        "Email": emailController.text
       }),
     );
 
+    loginModel = loginModelFromJson(response.body);
+
+    print(response.body);
+
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      if (data['success']) {
+
+      if (loginModel.password == passwordController.text) {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const Department()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: ${data['message']}')),
+          SnackBar(content: Text('Login failed: ')),
         );
       }
     } else {
@@ -81,7 +89,7 @@ class _LogInState extends State<LogIn> {
                           controller: emailController,
                           maxLength: 50,
                           decoration: const InputDecoration(
-                            labelText: 'Enter your Gmail',
+                            labelText: 'Enter your Email',
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.all(Radius.circular(15.0)),
                               borderSide: BorderSide(
@@ -140,7 +148,15 @@ class _LogInState extends State<LogIn> {
                             ),
                             const SizedBox(width: 20),
                             ElevatedButton(
-                              onPressed: loginApi,
+                              onPressed: () {
+
+                                loginApi();
+                                // Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute<void>(
+                                //       builder: (context) => const Department()),
+                                // );
+                              },
                               child: const Text('Log In'),
                             ),
                           ],

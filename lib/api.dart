@@ -1,3 +1,3 @@
 class Api_name {
-  String api = "192.168.0.191";
+  String api = "192.168.0.190";
 }
